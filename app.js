@@ -40,18 +40,36 @@ class Tree {
   }
 
   delete(value, node = this.root) {
-    //base case
+    //base case: nothing to delete
     if (node === null) return node;
     //traverse
     if (value < node.data) {
       node.left = this.delete(value, node.left);
     } else if (value > node.data) {
       node.right = this.delete(value, node.right);
-    } else {
+    }
+    //if the current node is the one to be deleted
+    else {
+      // node with only one child or no child
       if (node.right == null) return node.left;
       if (node.left == null) return node.right;
+
+      // node with two children
+      node.data = this.minValue(node.right);
+      node.right = this.delete(node.data, node.right);
     }
+
+    // Return the updated node after deletion
     return node;
+  }
+
+  minValue(node) {
+    let minValue = node.data;
+    while (node.left != null) {
+      minValue = node.left.data;
+      node = node.left;
+    }
+    return minValue;
   }
 }
 
@@ -71,6 +89,7 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 const tree = new Tree([50, 30, 70, 20, 40, 60, 80]);
 
 // tree.insert(29);
-tree.delete(20);
+// tree.delete(20);
+tree.delete(50);
 
 prettyPrint(tree.root);
