@@ -78,11 +78,6 @@ class Tree {
     if (data < node.data) return this.find(data, node.left);
     if (data > node.data) return this.find(data, node.right);
   }
-  /**
-   * 
-   levelOrder should traverse the tree in breadth-first level order and provide each node as an argument to the callback.
-    As a result, the callback will perform an operation on each node following the order in which they are traversed. 
-   */
 
   levelOrder(cb) {
     if (this.root == null) return;
@@ -95,7 +90,7 @@ class Tree {
     //repeat until queue is empty
     while (queue.length > 0) {
       const current = queue.shift(); //remove and save the current
-      cb ? cb(current) : levelOrdTraversalArray.push(current.data);
+      cb ? cb(current) : levelOrdTraversalArray.push(current.data); //if callback is present, call it for current else continue making array
 
       if (current.left) queue.push(current.left);
       if (current.right) queue.push(current.right);
@@ -103,6 +98,24 @@ class Tree {
 
     //
     return levelOrdTraversalArray;
+  }
+
+  levelOrderRecursive(cb, queue = [this.root], resultArray = []) {
+    if (this.root === null) return;
+
+    // Base case
+    if (queue.length === 0) return resultArray;
+
+    // Process the current node
+    const current = queue.shift();
+    cb ? cb(current) : resultArray.push(current.data);
+
+    // Enqueue the children
+    if (current.left) queue.push(current.left);
+    if (current.right) queue.push(current.right);
+
+    // Recursive call
+    return this.levelOrderRecursive(cb, queue, resultArray);
   }
 }
 
@@ -124,7 +137,6 @@ const tree = new Tree([50, 30, 70, 20, 40, 60, 80]);
 // tree.insert(29);
 // tree.delete(20);
 // tree.delete(50);
-
-console.log(tree.levelOrder());
+// console.log(tree.levelOrderRecursive());
 
 prettyPrint(tree.root);
