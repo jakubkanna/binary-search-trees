@@ -8,7 +8,7 @@ class Node {
 
 class Tree {
   constructor(array) {
-    const sortedArray = [...new Set(array)].sort((a, b) => a - b);
+    const sortedArray = [...new Set(array)].sort((a, b) => a - b); //new set checks for dups, sort sorts arr based on value comparasion
     this.root = this.buildTree(sortedArray);
   }
 
@@ -154,6 +154,16 @@ class Tree {
 
     return list;
   }
+
+  //Height is defined as the number of edges in the longest path from a given node to a leaf node.
+  height(node = this.root) {
+    if (node === null) return 0;
+    //Traverse
+    const left = this.height(node.left);
+    const right = this.height(node.right);
+    // Find the longest path and add 1 for the current node
+    return Math.max(left, right) + 1;
+  }
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -177,5 +187,6 @@ const tree = new Tree([50, 30, 70, 20, 40, 60, 80]);
 // console.log(tree.levelOrderRecursive());
 // console.log(tree.preOrder());
 // console.log(tree.inOrder());
+console.log(tree.height());
 
 prettyPrint(tree.root);
