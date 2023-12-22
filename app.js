@@ -8,19 +8,20 @@ class Node {
 
 class Tree {
   constructor(array) {
-    const sortedArray = [...new Set(array)].sort((a, b) => a - b); //new set checks for dups, sort sorts arr based on value comparasion
+    // Ensure uniqueness and sort the array
+    const sortedArray = [...new Set(array)].sort((a, b) => a - b);
     this.root = this.buildTree(sortedArray);
   }
 
   buildTree(arr) {
-    //base case
+    // Base case
     if (arr.length === 0) return null;
 
-    //init
-    const mid = Math.floor(arr.length / 2); //arr must be sorted
+    // Initialize
+    const mid = Math.floor(arr.length / 2);
     const node = new Node(arr[mid]);
 
-    //make left and right
+    // Create left and right subtrees
     node.left = this.buildTree(arr.slice(0, mid));
     node.right = this.buildTree(arr.slice(mid + 1));
 
@@ -29,10 +30,10 @@ class Tree {
   }
 
   insert(value, node = this.root) {
-    //base case (node.left or node.right changes from null to a new node)
+    // Base case: node.left or node.right changes from null to a new node
     if (node === null) return new Node(value);
 
-    //traverse
+    // Traverse
     node.data < value
       ? (node.right = this.insert(value, node.right))
       : (node.left = this.insert(value, node.left));
@@ -41,23 +42,20 @@ class Tree {
   }
 
   delete(value, node = this.root) {
-    //base case: nothing to delete
+    // Base case: nothing to delete
     if (node === null) return node;
 
-    //traverse
+    // Traverse
     if (value < node.data) {
       node.left = this.delete(value, node.left);
     } else if (value > node.data) {
       node.right = this.delete(value, node.right);
-    }
-
-    //if the current node is the one to be deleted
-    else {
-      // node with only one child or no child
+    } else {
+      // Node with only one child or no child
       if (node.right == null) return node.left;
       if (node.left == null) return node.right;
 
-      // node with two children
+      // Node with two children
       node.data = this.#minValue(node.right);
       node.right = this.delete(node.data, node.right);
     }
@@ -95,20 +93,19 @@ class Tree {
   levelOrder(cb) {
     if (this.root == null) return;
 
-    // create queue which track child nodes
+    // Create a queue to track child nodes
     const queue = [this.root];
     const levelOrdTraversalArray = [];
 
-    //repeat until queue is empty
+    // Repeat until the queue is empty
     while (queue.length > 0) {
-      const current = queue.shift(); //remove and save the current
-      cb ? cb(current) : levelOrdTraversalArray.push(current.data); //if callback is present, call it for current else continue making array
+      const current = queue.shift(); // Remove and save the current
+      cb ? cb(current) : levelOrdTraversalArray.push(current.data); // If a callback is present, call it for the current; else, continue making an array
 
       if (current.left) queue.push(current.left);
       if (current.right) queue.push(current.right);
     }
 
-    //
     return levelOrdTraversalArray;
   }
 
@@ -130,7 +127,7 @@ class Tree {
     return this.levelOrderRecursive(cb, queue, resultArray);
   }
 
-  // left, root, right
+  // Left, root, right
   inOrder(cb, node = this.root, list = []) {
     if (node === null) return;
 
@@ -141,20 +138,22 @@ class Tree {
     return list;
   }
 
-  // root, left, right
+  // Root, left, right
   preOrder(cb, node = this.root, list = []) {
-    //base case
+    // Base case
     if (node === null) return;
-    //process node
+
+    // Process node
     cb ? cb(node) : list.push(node.data);
-    //recursive call left and right
+
+    // Recursive call left and right
     this.preOrder(cb, node.left, list);
     this.preOrder(cb, node.right, list);
-    //
+
     return list;
   }
 
-  //left, right, root
+  // Left, right, root
   postOrder(cb, node = this.root, list = []) {
     if (node === null) return;
 
@@ -165,26 +164,31 @@ class Tree {
     return list;
   }
 
-  //Height is defined as the number of edges in the longest path from a given node to a leaf node.
+  // Height is defined as the number of edges in the longest path from a given node to a leaf node.
   height(node = this.root) {
     if (node === null) return 0;
-    //Traverse
+
+    // Traverse
     const left = this.height(node.left);
     const right = this.height(node.right);
+
     // Find the longest path and add 1 for the current node
     return Math.max(left, right) + 1;
   }
 
-  //Depth is defined as the number of edges in the path from a given node to the tree’s root node.
+  // Depth is defined as the number of edges in the path from a given node to the tree’s root node.
   depth(value, node = this.root, edgeCount = 0) {
     if (node === null) return;
+
     if (node.data === value) return edgeCount;
+
     if (node.data < value) {
       return this.depth(value, node.right, edgeCount + 1);
     } else {
       return this.depth(value, node.left, edgeCount + 1);
     }
   }
+
   // A balanced tree is one where the difference between heights of the left subtree and the right subtree of every node is not more than 1.
   isBalanced() {
     return this.#testBalance(this.root) !== -1;
@@ -203,12 +207,13 @@ class Tree {
     return Math.max(left, right) + 1;
   }
 
-  //use a traversal method to provide a new array to the buildTree function.
+  // Use a traversal method to provide a new array to the buildTree function.
   rebalance() {
     const inorderList = this.inOrder();
     this.root = this.buildTree(inorderList);
   }
 
+  // Visualize tree in console
   prettyPrint = (node, prefix = "", isLeft = true) => {
     if (node === null) {
       return;
