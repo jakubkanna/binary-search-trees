@@ -15,6 +15,7 @@ class Tree {
   buildTree(arr) {
     //base case
     if (arr.length === 0) return null;
+
     //init
     const mid = Math.floor(arr.length / 2); //arr must be sorted
     const node = new Node(arr[mid]);
@@ -42,12 +43,14 @@ class Tree {
   delete(value, node = this.root) {
     //base case: nothing to delete
     if (node === null) return node;
+
     //traverse
     if (value < node.data) {
       node.left = this.delete(value, node.left);
     } else if (value > node.data) {
       node.right = this.delete(value, node.right);
     }
+
     //if the current node is the one to be deleted
     else {
       // node with only one child or no child
@@ -83,7 +86,6 @@ class Tree {
     if (this.root == null) return;
 
     // create queue which track child nodes
-
     const queue = [this.root];
     const levelOrdTraversalArray = [];
 
@@ -117,6 +119,41 @@ class Tree {
     // Recursive call
     return this.levelOrderRecursive(cb, queue, resultArray);
   }
+
+  // left, root, right
+  inOrder(cb, node = this.root, list = []) {
+    if (node === null) return;
+
+    this.inOrder(cb, node.left, list);
+    cb ? cb(node) : list.push(node.data);
+    this.inOrder(cb, node.right, list);
+
+    return list;
+  }
+
+  // root, left, right
+  preOrder(cb, node = this.root, list = []) {
+    //base case
+    if (node === null) return;
+    //process node
+    cb ? cb(node) : list.push(node.data);
+    //recursive call left and right
+    this.preOrder(cb, node.left, list);
+    this.preOrder(cb, node.right, list);
+    //
+    return list;
+  }
+
+  //left, right, root
+  postOrder(cb, node = this.root, list = []) {
+    if (node === null) return;
+
+    this.postOrder(cb, node.left, list);
+    this.postOrder(cb, node.right, list);
+    cb ? cb(node) : list.push(node.data);
+
+    return list;
+  }
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -138,5 +175,7 @@ const tree = new Tree([50, 30, 70, 20, 40, 60, 80]);
 // tree.delete(20);
 // tree.delete(50);
 // console.log(tree.levelOrderRecursive());
+// console.log(tree.preOrder());
+// console.log(tree.inOrder());
 
 prettyPrint(tree.root);
