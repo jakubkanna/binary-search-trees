@@ -58,7 +58,7 @@ class Tree {
       if (node.left == null) return node.right;
 
       // node with two children
-      node.data = this.minValue(node.right);
+      node.data = this.#minValue(node.right);
       node.right = this.delete(node.data, node.right);
     }
 
@@ -66,7 +66,7 @@ class Tree {
     return node;
   }
 
-  minValue(node) {
+  #minValue(node) {
     let minValue = node.data;
     while (node.left != null) {
       minValue = node.left.data;
@@ -76,10 +76,20 @@ class Tree {
   }
 
   find(data, node = this.root) {
-    if (node.data === data) return node;
+    if (node === null) {
+      // If the current node is null, the data is not found
+      return "not found";
+    }
 
-    if (data < node.data) return this.find(data, node.left);
-    if (data > node.data) return this.find(data, node.right);
+    if (node.data === data) {
+      // The data is found at the current node
+      return "found";
+    }
+
+    // Continue searching in the left or right subtree
+    return data < node.data
+      ? this.find(data, node.left)
+      : this.find(data, node.right);
   }
 
   levelOrder(cb) {
@@ -164,29 +174,59 @@ class Tree {
     // Find the longest path and add 1 for the current node
     return Math.max(left, right) + 1;
   }
+
+  //Depth is defined as the number of edges in the path from a given node to the tree’s root node.
+  depth(value, node = this.root, edgeCount = 0) {
+    if (node === null) return;
+    if (node.data === value) return edgeCount;
+    if (node.data < value) {
+      return this.depth(value, node.right, edgeCount + 1);
+    } else {
+      return this.depth(value, node.left, edgeCount + 1);
+    }
+  }
+  // A balanced tree is one where the difference between heights of the left subtree and the right subtree of every node is not more than 1.
+  isBalanced() {
+    return this.#testBalance(this.root) !== -1;
+  }
+
+  #testBalance(node) {
+    if (node === null) return 0;
+
+    const left = this.#testBalance(node.left);
+    const right = this.#testBalance(node.right);
+    const diff = Math.abs(left - right);
+
+    if (left === -1 || right === -1 || diff > 1) {
+      return -1;
+    }
+    return Math.max(left, right) + 1;
+  }
+
+  //use a traversal method to provide a new array to the buildTree function.
+  rebalance() {
+    const inorderList = this.inOrder();
+    this.root = this.buildTree(inorderList);
+  }
+
+  prettyPrint = (node, prefix = "", isLeft = true) => {
+    if (node === null) {
+      return;
+    }
+    if (node.right !== null) {
+      this.prettyPrint(
+        node.right,
+        `${prefix}${isLeft ? "│   " : "    "}`,
+        false
+      );
+    }
+    console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+    if (node.left !== null) {
+      this.prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+    }
+  };
 }
 
-const prettyPrint = (node, prefix = "", isLeft = true) => {
-  if (node === null) {
-    return;
-  }
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  }
+module.exports = {
+  Tree,
 };
-
-const tree = new Tree([50, 30, 70, 20, 40, 60, 80]);
-
-// tree.insert(29);
-// tree.delete(20);
-// tree.delete(50);
-// console.log(tree.levelOrderRecursive());
-// console.log(tree.preOrder());
-// console.log(tree.inOrder());
-console.log(tree.height());
-
-prettyPrint(tree.root);
