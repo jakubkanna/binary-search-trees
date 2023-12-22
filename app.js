@@ -78,6 +78,25 @@ class Tree {
     if (data < node.data) return this.find(data, node.left);
     if (data > node.data) return this.find(data, node.right);
   }
+
+  levelOrder(cb) {
+    if (this.root == null) return;
+
+    const queue = [this.root];
+    const levelOrdTraversalArray = [];
+    // create queue which track child nodes
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      levelOrdTraversalArray.push(current.data);
+
+      if (current.left) queue.push(current.left);
+
+      if (current.right) queue.push(current.right);
+    }
+    //
+    return levelOrdTraversalArray;
+  }
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -97,6 +116,8 @@ const tree = new Tree([50, 30, 70, 20, 40, 60, 80]);
 
 // tree.insert(29);
 // tree.delete(20);
-tree.delete(50);
+// tree.delete(50);
+
+console.log(tree.levelOrder());
 
 prettyPrint(tree.root);
